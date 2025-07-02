@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
@@ -8,6 +7,7 @@ const http = require('http');
 const token = process.env.BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const port = process.env.PORT || 9000;
+
 const bot = new TelegramBot(token, { polling: true });
 
 // === LOAD SUBSCRIBERS ===
@@ -31,7 +31,7 @@ function saveSubscribers() {
   fs.writeFileSync('subscribers.json', JSON.stringify(subscribers, null, 2));
 }
 
-// === COMMAND: /start ===
+// === /start COMMAND ===
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   if (!subscribers.includes(chatId)) {
@@ -41,21 +41,21 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'স্বাগতম! আপনি সফলভাবে AIR BOT HOSTING BOT-এ সাবস্ক্রাইব করেছেন।');
 });
 
-// === COMMAND: /newpost <message> (admin only) ===
+// === /newpost (admin only) ===
 bot.onText(/\/newpost (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const message = match[1];
 
   if (String(chatId) !== adminId) {
-    return bot.sendMessage(chatId, 'আপনি এই কমান্ড ব্যবহারের অনুমতি পাননি।');
+    return bot.sendMessage(chatId, '❌ আপনি এই কমান্ড ব্যবহারের অনুমতি পাননি।');
   }
 
   subscribers.forEach(id => {
-    bot.sendMessage(id, `📢 নতুন বার্তা: ${message}`);
+    bot.sendMessage(id, `📢 নতুন বার্তা:\n${message}`);
   });
 });
 
-// === DEFAULT RESPONSE BASED ON KEYWORDS ===
+// === KEYWORD BASED RESPONSES ===
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.toLowerCase();
@@ -68,9 +68,8 @@ bot.on('message', (msg) => {
   }
 });
 
-// === START HTTP SERVER FOR RENDER (port) ===
+// === RENDER KEEP-ALIVE SERVER ===
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('AIR BOT HOSTING BOT is running!
-');
+  res.end('AIR BOT HOSTING BOT is running!\n');
 }).listen(port);
