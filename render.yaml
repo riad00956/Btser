@@ -1,0 +1,14 @@
+
+services:
+  - type: web
+    name: air-bot-hosting-bot
+    env: node
+    plan: free
+    buildCommand: 'npm install'
+    startCommand: 'node bot.js'
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    ports:
+      - port: 9000
